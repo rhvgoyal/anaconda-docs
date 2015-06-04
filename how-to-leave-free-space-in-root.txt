@@ -1,0 +1,52 @@
+		How to leave free space in root volume group
+		--------------------------------------------
+
+Primarily there are two methods to leave free space in root volume group. One
+can use interactive graphical installation or one can use a kickstart file
+to control the installation.
+
+Interactive Graphical Install
+----------------------------
+- Start Graphical Installation
+
+- Click on "Installation Destination"
+
+- On next screen under "Other Storage Options/Partitionig" select
+  "I will configure partitioning".
+
+- On next screen click on "Click here to create them automatically". This
+  will create a default partitioning scheme.
+
+- Click on "/". And this will show default "Desired Capacity" on right.
+
+- Reduce that capacity to leave some free space in root volume group.
+
+- By default root volume group is big enough to accomodate user created
+  volumes. Any free space on disk is left free and is not part of volume
+  group. Change that by clicking on "Modify" and selecting "Size policy"
+  as "As large as possible". Click on "Save".
+
+  This should make sure that any unused space on disk is left free in root
+  volume group.
+
+- Click on "Done"
+
+- Accept proposed partitioning.
+
+- Click on "Begin Installation"
+
+Use a kickstart file
+--------------------
+One can use a kickstart file to create custom partitions. kickstart option
+"volgroup" provides options "--reserved-percent" and "--reserved-space" where
+one can specify how much space to leave free in volume group.
+
+Following is a smaple portion of kickstart which can be used to leave 20%
+free space in root volume group.
+
+# Disk partitioning information
+part /boot --size=500
+part pv.1 --size=500 --grow
+volgroup rhel --pesize=4096 pv.1 --reserved-percent=20
+logvol /  --size=500 --grow --name=root --vgname=rhel
+logvol swap --size=2048 --name=swap --vgname=rhel
