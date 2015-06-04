@@ -1,0 +1,26 @@
+- Create a kickstart file named ks.cfg
+
+Prepare a CD-ROM with kickstart file
+====================================
+- Take existing iso and mount it.
+  $ mount -o loop RHEL-7.1-20150219.1-Server-x86_64-dvd1.iso  iso-mount/
+
+- Copy over the image into a directory so that it can be written to.
+  $ tar -cvf - linux | (mkdir -p ../iso-mount-copy/ && cd ../iso-mount-copy/ && tar -xf -)
+
+- Copy ks.cfg to iso-mount-copy/ dir.
+  cp ks.cfg iso-mount-copy/ks.cfg
+
+- Repackage dir to make iso file. Pay attention to label (-V) option. Use
+  same label as original iso. (Use file <iso> to figure out label).
+
+  $ cd iso-mount-copy/
+  $ mkisofs -o ../foo-rhel-7.1-modified-dvd.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot --boot-load-size 4 -boot-info-table -J -R -V "RHEL-7.1 Server.x86_64" .
+
+- Create virtual machine specifying this iso as source. Press Tab on command
+  line and specify kickstart file location.
+
+  ks=cdrom:sr0:/ks.cfg
+
+- Boot. This should automatically start installation as per instructions
+  in kickstart file.
